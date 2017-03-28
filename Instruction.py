@@ -19,11 +19,13 @@ class Instruction:
         :param inst_arg3: third arg (could be register, immediate, or branch target)
         """
         self.name = inst_name.lower()
-        self._arg1 = inst_arg1.lower().replace("$", "")
-        self._arg2 = inst_arg2.lower().replace("$", "")
-        self._arg3 = inst_arg3.lower().replace("$", "")
+        self._arg1 = inst_arg1.lower().replace("$", "") if inst_arg1 is not None else inst_arg1
+        self._arg2 = inst_arg2.lower().replace("$", "") if inst_arg2 is not None else inst_arg2
+        self._arg3 = inst_arg3.lower().replace("$", "") if inst_arg3 is not None else inst_arg3
 
         self.format = None
+        self.branching = False
+        self.memory_op = False
         self.binary_name = None
         self.opcode = None
         self.rs = None
@@ -68,7 +70,12 @@ class Instruction:
         :param desired_len: how long should the final number be? (WILL NOT TRUNCATE IF desired_len == < len(decimal_num)
         :return: string
         """
-        return bin(int(decimal_num))[2:].zfill(desired_len)
+        num = bin(int(decimal_num))[2:].zfill(desired_len)
+        if len(num) != desired_len:
+            raise Exception(
+                "Error creating binary number of desired length! (did this function get a binary value instead?)")
+        else:
+            return num
 
     @staticmethod
     def decode_asm_register(register):
@@ -79,6 +86,8 @@ class Instruction:
         """
         if register == "zero":
             return 0
+        elif register in ['v0', 'v1']:
+            return int(register[1]) + 2
         elif register in ['a0', 'a1', 'a2', 'a3']:
             return int(register[1]) + 4
         elif register in ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7']:
@@ -108,6 +117,10 @@ class Instruction:
 
         elif self.name in ['addi', 'andi', 'beq', 'bne', 'lw', 'sw']:
             self.format = "I"
+            if self.name in ['beq', 'bne']:
+                self.branching = True
+            elif self.name in ['lw', 'sw']:
+                self.memory_op = True
 
         elif self.name == 'j':
             self.format = "J"
@@ -157,14 +170,18 @@ class Instruction:
     # TODO: Add support for LW/SW instruction argument handling, BEQ/BNE operand reordering.
 
     def populate_rs(self):
-        if self.format == ("R" or "I"):
+        if self.format == "R" or (self.format == "I" and self.branching is False):
             self.rs = self.create_sized_binary_num(self.decode_asm_register(self._arg2), 5)
+        elif self.format == 'I' and self.branching is True:
+            self.rs = self.create_sized_binary_num(self.decode_asm_register(self._arg1), 5)
 
     def populate_rt(self):
         if self.format == "R":
             self.rt = self.create_sized_binary_num(self.decode_asm_register(self._arg3), 5)
-        elif self.format == "I":
+        elif self.format == "I" and self.branching is False:
             self.rt = self.create_sized_binary_num(self.decode_asm_register(self._arg1), 5)
+        elif self.format == "I" and self.branching is True:
+            self.rt = self.create_sized_binary_num(self.decode_asm_register(self._arg2), 5)
 
     def populate_rd(self):
         if self.format == "R":
