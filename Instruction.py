@@ -73,7 +73,7 @@ class Instruction:
         :return: string
         """
         if int(decimal_num) < 0:
-            decimal_num += (1 << desired_len)
+            decimal_num = int(decimal_num) + (1 << desired_len)
         num = bin(int(decimal_num))[2:].zfill(desired_len)
         if len(num) != desired_len:
             raise Exception(
@@ -92,7 +92,7 @@ class Instruction:
         if binary_num[0] == '1':
             return int(binary_num, 2) - (1 << bit_count)
         else:
-            return int(binary_num,2)
+            return int(binary_num, 2)
 
     @staticmethod
     def decode_asm_register(register):

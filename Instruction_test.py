@@ -9,6 +9,9 @@ class TestKnownInstructionConversion(unittest.TestCase):
     def test_addi_instruction(self):  # addi $t8, $zero, 1
         self.assertEqual('00100000000110000000000000000001', Instruction('addi', '$t8', '$zero', '1').binary_version())
 
+    def test_addi_instruction_neg_immediate(self):  # addi $t8, $zero, 1
+        self.assertEqual('00100000000110001111111111110110', Instruction('addi', '$t8', '$zero', '-10').binary_version())
+
     def test_addi_hex_instruction(self):
         self.assertEqual('00100000000011000000000100000001', Instruction('addi', '$t4', '$zero', '257').binary_version())
 
