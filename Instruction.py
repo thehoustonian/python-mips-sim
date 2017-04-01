@@ -66,16 +66,33 @@ class Instruction:
         Takes inspiration from:
         http://stackoverflow.com/questions/1395356/how-can-i-make-bin30-return-00011110-instead-of-0b11110
 
+        for 2s complement processing: http://stackoverflow.com/questions/1604464/twos-complement-in-python
+
         :param decimal_num: decimal representation of the number
         :param desired_len: how long should the final number be? (WILL NOT TRUNCATE IF desired_len == < len(decimal_num)
         :return: string
         """
+        if int(decimal_num) < 0:
+            decimal_num += (1 << desired_len)
         num = bin(int(decimal_num))[2:].zfill(desired_len)
         if len(num) != desired_len:
             raise Exception(
                 "Error creating binary number of desired length! (did this function get a binary value instead?)")
         else:
             return num
+
+    @staticmethod
+    def decode_signed_binary_number(binary_num, bit_count):
+        """
+        It's nice to be able to decode the signed binary numbers too.
+        :param binary_num:
+        :param bit_count:
+        :return:
+        """
+        if binary_num[0] == '1':
+            return int(binary_num, 2) - (1 << bit_count)
+        else:
+            return int(binary_num,2)
 
     @staticmethod
     def decode_asm_register(register):
@@ -166,8 +183,6 @@ class Instruction:
 
         if len(self.opcode) != 6:
             raise Exception("Problem creating opcode string")
-
-    # TODO: Add support for LW/SW instruction argument handling, BEQ/BNE operand reordering.
 
     def populate_rs(self):
         if self.format == "R" or (self.format == "I" and self.branching is False):
