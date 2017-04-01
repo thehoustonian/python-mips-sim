@@ -54,6 +54,13 @@ class Fetch:
         else:
             self.program_counter = new_address
 
+    def increment_program_counter(self):
+        """
+        Increments the program counter by adding four to the address
+        :return: None
+        """
+        self.update_program_counter(self.program_counter + 4)
+
 
 class Decode:
     def __init__(self):

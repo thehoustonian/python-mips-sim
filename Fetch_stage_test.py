@@ -52,6 +52,11 @@ class MyTestCase(unittest.TestCase):
             fetch_object.fetch_instruction()
         self.assertTrue("Invalid Instruction Address!" in str(cm.exception))
 
+    def test_fetch_instruction_increment_program_counter(self):
+        fetch_object = Fetch(MyTestCase.Instruction_list, '0')
+        self.assertEqual(0, fetch_object.program_counter)
+        fetch_object.increment_program_counter()
+        self.assertEqual(4, fetch_object.program_counter)
 
 if __name__ == '__main__':
     unittest.main()
