@@ -1,5 +1,5 @@
 import unittest
-from Instruction import Instruction
+from Instruction import Instruction, create_sized_binary_num, decode_signed_binary_number
 
 
 class TestKnownInstructionConversion(unittest.TestCase):
@@ -52,24 +52,24 @@ class TestKnownInstructionConversion(unittest.TestCase):
         self.assertEqual('00000010011100101001100000100110', Instruction('xor', '$s3', '$s3', '$s2').binary_version())
 
     def test_signed_binary_conversion(self):
-        num1 = Instruction.create_sized_binary_num(-12, 8)
-        num2 = Instruction.create_sized_binary_num(-24, 8)
-        num3 = Instruction.create_sized_binary_num(-1, 8)
-        num4 = Instruction.create_sized_binary_num(0, 8)
-        num5 = Instruction.create_sized_binary_num(-2, 8)
-        num6 = Instruction.create_sized_binary_num(4, 8)
+        num1 = create_sized_binary_num(-12, 8)
+        num2 = create_sized_binary_num(-24, 8)
+        num3 = create_sized_binary_num(-1, 8)
+        num4 = create_sized_binary_num(0, 8)
+        num5 = create_sized_binary_num(-2, 8)
+        num6 = create_sized_binary_num(4, 8)
         self.assertEqual('11110100', num1)
         self.assertEqual('11101000', num2)
         self.assertEqual('11111111', num3)
         self.assertEqual('00000000', num4)
         self.assertEqual('11111110', num5)
         self.assertEqual('00000100', num6)
-        self.assertEqual(-12, Instruction.decode_signed_binary_number(num1, 8))
-        self.assertEqual(-24, Instruction.decode_signed_binary_number(num2, 8))
-        self.assertEqual(-1, Instruction.decode_signed_binary_number(num3, 8))
-        self.assertEqual(0, Instruction.decode_signed_binary_number(num4, 8))
-        self.assertEqual(-2, Instruction.decode_signed_binary_number(num5, 8))
-        self.assertEqual(4, Instruction.decode_signed_binary_number(num6, 8))
+        self.assertEqual(-12, decode_signed_binary_number(num1, 8))
+        self.assertEqual(-24, decode_signed_binary_number(num2, 8))
+        self.assertEqual(-1, decode_signed_binary_number(num3, 8))
+        self.assertEqual(0, decode_signed_binary_number(num4, 8))
+        self.assertEqual(-2, decode_signed_binary_number(num5, 8))
+        self.assertEqual(4, decode_signed_binary_number(num6, 8))
 
 if __name__ == '__main__':
     unittest.main()

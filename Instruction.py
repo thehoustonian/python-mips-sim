@@ -9,6 +9,41 @@ Author: Trey Franklin
 """
 
 
+def create_sized_binary_num(decimal_num, desired_len):
+    """
+    Returns a string representing a binary number with a specific size (buffers with zeros to get correct len)
+    Takes inspiration from:
+    http://stackoverflow.com/questions/1395356/how-can-i-make-bin30-return-00011110-instead-of-0b11110
+
+    for 2s complement processing: http://stackoverflow.com/questions/1604464/twos-complement-in-python
+
+    :param decimal_num: decimal representation of the number
+    :param desired_len: how long should the final number be? (WILL NOT TRUNCATE IF desired_len == < len(decimal_num)
+    :return: binary string
+    """
+    if int(decimal_num) < 0:
+        decimal_num = int(decimal_num) + (1 << desired_len)
+    num = bin(int(decimal_num))[2:].zfill(desired_len)
+    if len(num) != desired_len:
+        raise Exception(
+            "Error creating binary number of desired length! (did this function get a binary value instead?)")
+    else:
+        return num
+
+
+def decode_signed_binary_number(binary_num, bit_count):
+    """
+    It's nice to be able to decode the signed binary numbers too.
+    :param binary_num: the string representation of the binary number
+    :param bit_count: how many bits in the binary number?
+    :return: integer representing the binary number
+    """
+    if binary_num[0] == '1':
+        return int(binary_num, 2) - (1 << bit_count)
+    else:
+        return int(binary_num, 2)
+
+
 class Instruction:
     def __init__(self, inst_name, inst_arg1, inst_arg2=None, inst_arg3=None):
         """
@@ -31,7 +66,7 @@ class Instruction:
         self.rs = None
         self.rt = None
         self.rd = None
-        self.shift_amount = self.create_sized_binary_num(0, 5)
+        self.shift_amount = create_sized_binary_num(0, 5)
         self.function_field = None
         self.immediate = None
         self.address = None
@@ -58,41 +93,6 @@ class Instruction:
             self.full_binary_rep = "{}{}".format(self.opcode, self.address)
         else:
             raise Exception("Something broke and idk what happened in Instruction class.")
-
-    @staticmethod
-    def create_sized_binary_num(decimal_num, desired_len):
-        """
-        Returns a string representing a binary number with a specific size (buffers with zeros to get correct len)
-        Takes inspiration from:
-        http://stackoverflow.com/questions/1395356/how-can-i-make-bin30-return-00011110-instead-of-0b11110
-
-        for 2s complement processing: http://stackoverflow.com/questions/1604464/twos-complement-in-python
-
-        :param decimal_num: decimal representation of the number
-        :param desired_len: how long should the final number be? (WILL NOT TRUNCATE IF desired_len == < len(decimal_num)
-        :return: string
-        """
-        if int(decimal_num) < 0:
-            decimal_num = int(decimal_num) + (1 << desired_len)
-        num = bin(int(decimal_num))[2:].zfill(desired_len)
-        if len(num) != desired_len:
-            raise Exception(
-                "Error creating binary number of desired length! (did this function get a binary value instead?)")
-        else:
-            return num
-
-    @staticmethod
-    def decode_signed_binary_number(binary_num, bit_count):
-        """
-        It's nice to be able to decode the signed binary numbers too.
-        :param binary_num:
-        :param bit_count:
-        :return:
-        """
-        if binary_num[0] == '1':
-            return int(binary_num, 2) - (1 << bit_count)
-        else:
-            return int(binary_num, 2)
 
     @staticmethod
     def decode_asm_register(register):
@@ -151,32 +151,32 @@ class Instruction:
         :return:
         """
         if self.format == 'R':
-            self.opcode = self.create_sized_binary_num(0, 6)
+            self.opcode = create_sized_binary_num(0, 6)
 
         elif self.format == 'I':
             if self.name == 'addi':
-                self.opcode = self.create_sized_binary_num(8, 6)
+                self.opcode = create_sized_binary_num(8, 6)
 
             elif self.name == 'andi':
-                self.opcode = self.create_sized_binary_num(12, 6)
+                self.opcode = create_sized_binary_num(12, 6)
 
             elif self.name == 'beq':
-                self.opcode = self.create_sized_binary_num(4, 6)
+                self.opcode = create_sized_binary_num(4, 6)
 
             elif self.name == 'bne':
-                self.opcode = self.create_sized_binary_num(5, 6)
+                self.opcode = create_sized_binary_num(5, 6)
 
             elif self.name == 'lw':
-                self.opcode = self.create_sized_binary_num(35, 6)
+                self.opcode = create_sized_binary_num(35, 6)
 
             elif self.name == 'sw':
-                self.opcode = self.create_sized_binary_num(43, 6)
+                self.opcode = create_sized_binary_num(43, 6)
 
             else:
                 raise Exception("Unrecognized I-Format Instruction")
 
         elif self.format == 'J':
-            self.opcode = self.create_sized_binary_num(2, 6)
+            self.opcode = create_sized_binary_num(2, 6)
 
         else:
             raise Exception("Unrecognized format")
@@ -186,50 +186,50 @@ class Instruction:
 
     def populate_rs(self):
         if self.format == "R" or (self.format == "I" and self.branching is False):
-            self.rs = self.create_sized_binary_num(self.decode_asm_register(self._arg2), 5)
+            self.rs = create_sized_binary_num(self.decode_asm_register(self._arg2), 5)
         elif self.format == 'I' and self.branching is True:
-            self.rs = self.create_sized_binary_num(self.decode_asm_register(self._arg1), 5)
+            self.rs = create_sized_binary_num(self.decode_asm_register(self._arg1), 5)
 
     def populate_rt(self):
         if self.format == "R":
-            self.rt = self.create_sized_binary_num(self.decode_asm_register(self._arg3), 5)
+            self.rt = create_sized_binary_num(self.decode_asm_register(self._arg3), 5)
         elif self.format == "I" and self.branching is False:
-            self.rt = self.create_sized_binary_num(self.decode_asm_register(self._arg1), 5)
+            self.rt = create_sized_binary_num(self.decode_asm_register(self._arg1), 5)
         elif self.format == "I" and self.branching is True:
-            self.rt = self.create_sized_binary_num(self.decode_asm_register(self._arg2), 5)
+            self.rt = create_sized_binary_num(self.decode_asm_register(self._arg2), 5)
 
     def populate_rd(self):
         if self.format == "R":
-            self.rd = self.create_sized_binary_num(self.decode_asm_register(self._arg1), 5)
+            self.rd = create_sized_binary_num(self.decode_asm_register(self._arg1), 5)
 
     def populate_function_field(self):
         if self.format == "R":
             if self.name == 'add':
-                self.function_field = self.create_sized_binary_num(32, 6)
+                self.function_field = create_sized_binary_num(32, 6)
             elif self.name == 'and':
-                self.function_field = self.create_sized_binary_num(36, 6)
+                self.function_field = create_sized_binary_num(36, 6)
             elif self.name == 'div':
-                self.function_field = self.create_sized_binary_num(26, 6)
+                self.function_field = create_sized_binary_num(26, 6)
             elif self.name == 'or':
-                self.function_field = self.create_sized_binary_num(37, 6)
+                self.function_field = create_sized_binary_num(37, 6)
             elif self.name == 'mult':
-                self.function_field = self.create_sized_binary_num(24, 6)
+                self.function_field = create_sized_binary_num(24, 6)
             elif self.name == 'slt':
-                self.function_field = self.create_sized_binary_num(42, 6)
+                self.function_field = create_sized_binary_num(42, 6)
             elif self.name == 'sub':
-                self.function_field = self.create_sized_binary_num(34, 6)
+                self.function_field = create_sized_binary_num(34, 6)
             elif self.name == 'xor':
-                self.function_field = self.create_sized_binary_num(38, 6)
+                self.function_field = create_sized_binary_num(38, 6)
             else:
                 raise Exception("Unsupported R-format instruction/funct field error")
 
     def populate_immediate(self):
         if self.format == "I":
-            self.immediate = self.create_sized_binary_num(self._arg3, 16)
+            self.immediate = create_sized_binary_num(self._arg3, 16)
 
     def populate_address(self):
         if self.format == "J":
-            self.address = self.create_sized_binary_num(self._arg1, 26)
+            self.address = create_sized_binary_num(self._arg1, 26)
 
     def binary_version(self):
         return self.full_binary_rep
