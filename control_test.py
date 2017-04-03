@@ -25,7 +25,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(False, control.MemRead)
         self.assertEqual(False, control.MemWrite)
         self.assertEqual(False, control.Branch)
-        self.assertEqual([0, 1], control.ALUOp)
+        self.assertEqual(0b10, control.ALUOp)
         self.assertEqual(False, control.jump)
 
     def test_control_lw(self):
@@ -38,7 +38,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(True, control.MemRead)
         self.assertEqual(False, control.MemWrite)
         self.assertEqual(False, control.Branch)
-        self.assertEqual([0, 0], control.ALUOp)
+        self.assertEqual(0b00, control.ALUOp)
         self.assertEqual(False, control.jump)
 
     def test_control_sw(self):
@@ -51,7 +51,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(False, control.MemRead)
         self.assertEqual(True, control.MemWrite)
         self.assertEqual(False, control.Branch)
-        self.assertEqual([0, 0], control.ALUOp)
+        self.assertEqual(0b00, control.ALUOp)
         self.assertEqual(False, control.jump)
 
     def test_control_beq(self):
@@ -64,7 +64,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(False, control.MemRead)
         self.assertEqual(False, control.MemWrite)
         self.assertEqual(True, control.Branch)
-        self.assertEqual([1, 0], control.ALUOp)
+        self.assertEqual(0b01, control.ALUOp)
         self.assertEqual(False, control.jump)
 
     def test_control_bne(self):
@@ -77,7 +77,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(False, control.MemRead)
         self.assertEqual(False, control.MemWrite)
         self.assertEqual(True, control.Branch)
-        self.assertEqual([1, 0], control.ALUOp)
+        self.assertEqual(0b01, control.ALUOp)
         self.assertEqual(False, control.jump)
 
     def test_control_addi(self):
@@ -90,7 +90,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(False, control.MemRead)
         self.assertEqual(False, control.MemWrite)
         self.assertEqual(False, control.Branch)
-        self.assertEqual([1, 1], control.ALUOp)
+        self.assertEqual(0b11, control.ALUOp)
         self.assertEqual(False, control.jump)
 
     def test_control_andi(self):
@@ -103,7 +103,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(False, control.MemRead)
         self.assertEqual(False, control.MemWrite)
         self.assertEqual(False, control.Branch)
-        self.assertEqual([1, 1], control.ALUOp)
+        self.assertEqual(0b11, control.ALUOp)
         self.assertEqual(False, control.jump)
 
     def test_control_jump(self):
@@ -116,7 +116,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(False, control.MemRead)
         self.assertEqual(False, control.MemWrite)
         self.assertEqual(False, control.Branch)
-        self.assertEqual([1, 0], control.ALUOp)
+        self.assertEqual(0b01, control.ALUOp)
         self.assertEqual(True, control.jump)
 
 

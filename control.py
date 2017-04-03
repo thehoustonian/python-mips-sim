@@ -28,7 +28,7 @@ class Control(object):
             self.MemRead = False
             self.MemWrite = False
             self.Branch = False
-            self.ALUOp = [0, 1]
+            self.ALUOp = 0b10
             self.jump = False
 
         elif opcode == 4 or opcode == 5:  # BEQ, BNE
@@ -39,7 +39,7 @@ class Control(object):
             self.MemRead = False
             self.MemWrite = False
             self.Branch = True
-            self.ALUOp = [1, 0]  # TODO: Distinguish these in the ALUControl
+            self.ALUOp = 0b01  # TODO: Distinguish these in the ALUControl
             self.jump = False
 
         elif opcode == 35:  # Load Word
@@ -50,7 +50,7 @@ class Control(object):
             self.MemRead = True
             self.MemWrite = False
             self.Branch = False
-            self.ALUOp = [0, 0]
+            self.ALUOp = 0b00
             self.jump = False
 
         elif opcode == 43:  # Store Word
@@ -61,7 +61,7 @@ class Control(object):
             self.MemRead = False
             self.MemWrite = True
             self.Branch = False
-            self.ALUOp = [0, 0]
+            self.ALUOp = 0b00
             self.jump = False
 
         elif opcode == 8 or opcode == 12:  # ADD immediate, AND immediate
@@ -72,7 +72,7 @@ class Control(object):
             self.MemRead = False
             self.MemWrite = False
             self.Branch = False
-            self.ALUOp = [1, 1]  # TODO: add logic in the ALU control to deal with immediates
+            self.ALUOp = 0b11  # TODO: add logic in the ALU control to deal with immediates
             self.jump = False
 
         elif opcode == 2:  # Jump instruction
@@ -83,5 +83,5 @@ class Control(object):
             self.MemRead = False
             self.MemWrite = False
             self.Branch = False
-            self.ALUOp = [1, 0]
+            self.ALUOp = 0b01
             self.jump = True
