@@ -1,11 +1,11 @@
 import unittest
 
 from Stages import Decode, Execute
-from Instruction import Instruction
+from Instruction import Instruction, create_sized_binary_num
 
 
 class MyTestCase(unittest.TestCase):
-    register_file = [None for i in range(0, 32)]  # empty register files
+    register_file = [create_sized_binary_num(65535, 32) for i in range(0, 32)]  # empty register files
 
     def test_create_decode(self):
         decode = Decode(self.register_file, Execute())
@@ -25,6 +25,12 @@ class MyTestCase(unittest.TestCase):
         decode.receive_instruction(Instruction('Add', "$t1", "$t2", "t3"), 8)
         decode.write_to_register("Test data.")
         self.assertEqual("Test data.", decode.register_file[9])
+
+    def test_correct_values_in_register_file(self):
+        decode = Decode(self.register_file, Execute())
+        decode.receive_instruction(Instruction('add', '$t1', '$t2', '$t3'), 8)
+        for value in decode.register_file:
+            self.assertEqual('00000000000000001111111111111111', value)
 
     def test_extend_immediate(self):
         decode = Decode(self.register_file, Execute())

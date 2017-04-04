@@ -19,7 +19,7 @@ class Control(object):
         self.jump = None
 
     def update(self, opcode):
-        opcode = int(opcode)
+        opcode = int(opcode, 2)
         if opcode == 0:  # R-Format
             self.RegDst = True
             self.ALUSrc = False

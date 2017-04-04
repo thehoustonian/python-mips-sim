@@ -25,6 +25,13 @@ class Interface(object):
         self.write_back = WriteBack()
 
     def clock_cycle(self):
+        """
+        For single-cycle, we really only do something useful in the fetch.on_rising_clock. It will call a method of the
+        next stage that will do what that stage needs to and then call the next stage, etc
+        In pipelined execution, these would be used because Fetch would fetch the instruction, place it in the
+        intermediate register, and then return back to here, where decode.on_rising_clock would be called.
+        :return:
+        """
         self.fetch.on_rising_clock(self.decode)
         self.decode.on_rising_clock()
         self.execute.on_rising_clock()

@@ -31,14 +31,15 @@ def create_sized_binary_num(decimal_num, desired_len):
         return num
 
 
-def decode_signed_binary_number(binary_num, bit_count):
+def decode_signed_binary_number(binary_num, bit_count, force_unsigned=False):  # TODO: Could this just call len() on the binary_num?
     """
     It's nice to be able to decode the signed binary numbers too.
     :param binary_num: the string representation of the binary number
     :param bit_count: how many bits in the binary number?
+    :param force_unsigned: Force this function to do an unsigned operation
     :return: integer representing the binary number
     """
-    if binary_num[0] == '1':
+    if binary_num[0] == '1' and not force_unsigned:
         return int(binary_num, 2) - (1 << bit_count)
     else:
         return int(binary_num, 2)
