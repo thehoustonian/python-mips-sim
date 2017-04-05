@@ -4,7 +4,7 @@ from Stages import Decode, Execute, WriteBack
 from Instruction import Instruction, create_sized_binary_num
 
 
-class MyTestCase(unittest.TestCase):
+class DecodeStageTest(unittest.TestCase):
     register_file = [create_sized_binary_num(65535, 32) for i in range(0, 32)]  # empty register files
 
     def test_create_decode(self):

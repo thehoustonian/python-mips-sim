@@ -2,7 +2,7 @@ import unittest
 from Instruction import Instruction, create_sized_binary_num, decode_signed_binary_number
 
 
-class TestKnownInstructionConversion(unittest.TestCase):
+class InstructionStageTest(unittest.TestCase):
     def test_add_instruction(self):
         self.assertEqual('00000001010010110100100000100000', Instruction('Add', "$t1", "$t2", "t3").binary_version())
 

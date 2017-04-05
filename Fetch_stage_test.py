@@ -9,7 +9,7 @@ Modified: 3/28/2017
 """
 
 
-class MyTestCase(unittest.TestCase):
+class FetchStageTest(unittest.TestCase):
     var_exit = '256'
     var_else = '256'
     var_end = '320'
@@ -23,37 +23,37 @@ class MyTestCase(unittest.TestCase):
 
     def test_create_fetch_with_values(self):
 
-        self.assertEqual(0, Fetch(MyTestCase.Instruction_list, '0').program_counter)
+        self.assertEqual(0, Fetch(FetchStageTest.Instruction_list, '0').program_counter)
 
     def test_increment_program_counter_bad_value(self):
-        fetch_object = Fetch(MyTestCase.Instruction_list, '0')
+        fetch_object = Fetch(FetchStageTest.Instruction_list, '0')
         with self.assertRaises(Exception) as cm:
             fetch_object.update_program_counter(2)
         self.assertTrue("Invalid Program Counter Value!" in str(cm.exception))
 
     def test_increment_program_counter_good_value(self):
-        fetch_object = Fetch(MyTestCase.Instruction_list, '0')
+        fetch_object = Fetch(FetchStageTest.Instruction_list, '0')
         fetch_object.update_program_counter(4)
         self.assertEqual(4, fetch_object.program_counter)
 
     def test_fetch_instruction_from_start_address(self):
-        fetch_object = Fetch(MyTestCase.Instruction_list, '0')
-        self.assertEqual(MyTestCase.Instruction_list[0].binary_version(), fetch_object.fetch_instruction().binary_version())
+        fetch_object = Fetch(FetchStageTest.Instruction_list, '0')
+        self.assertEqual(FetchStageTest.Instruction_list[0].binary_version(), fetch_object.fetch_instruction().binary_version())
 
     def test_increment_pc_and_fetch_instruction(self):
-        fetch_object = Fetch(MyTestCase.Instruction_list, '0')
+        fetch_object = Fetch(FetchStageTest.Instruction_list, '0')
         fetch_object.update_program_counter(4)
-        self.assertEqual(MyTestCase.Instruction_list[1].binary_version(), fetch_object.fetch_instruction().binary_version())
+        self.assertEqual(FetchStageTest.Instruction_list[1].binary_version(), fetch_object.fetch_instruction().binary_version())
 
     def test_fetch_instruction_bad_address_breaks(self):
-        fetch_object = Fetch(MyTestCase.Instruction_list, '0')
+        fetch_object = Fetch(FetchStageTest.Instruction_list, '0')
         fetch_object.update_program_counter(60)
         with self.assertRaises(Exception) as cm:
             fetch_object.fetch_instruction()
         self.assertTrue("Invalid Instruction Address!" in str(cm.exception))
 
     def test_fetch_instruction_increment_program_counter(self):
-        fetch_object = Fetch(MyTestCase.Instruction_list, '0')
+        fetch_object = Fetch(FetchStageTest.Instruction_list, '0')
         self.assertEqual(0, fetch_object.program_counter)
         fetch_object.increment_program_counter()
         self.assertEqual(4, fetch_object.program_counter)

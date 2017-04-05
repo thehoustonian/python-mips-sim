@@ -1,5 +1,6 @@
 import unittest
 from control import Control
+from Instruction import create_sized_binary_num
 
 
 class MyTestCase(unittest.TestCase):
@@ -17,7 +18,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_control_r_format(self):
         control = Control()
-        control.update(0)
+        control.update(create_sized_binary_num(0, 6))
         self.assertEqual(True, control.RegDst)
         self.assertEqual(False, control.ALUSrc)
         self.assertEqual(False, control.MemtoReg)
@@ -30,7 +31,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_control_lw(self):
         control = Control()
-        control.update(35)
+        control.update(create_sized_binary_num(35, 6))
         self.assertEqual(False, control.RegDst)
         self.assertEqual(True, control.ALUSrc)
         self.assertEqual(True, control.MemtoReg)
@@ -43,7 +44,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_control_sw(self):
         control = Control()
-        control.update(43)
+        control.update(create_sized_binary_num(43, 6))
         self.assertEqual(False, control.RegDst)
         self.assertEqual(True, control.ALUSrc)
         self.assertEqual(False, control.MemtoReg)
@@ -56,7 +57,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_control_beq(self):
         control = Control()
-        control.update(4)
+        control.update(create_sized_binary_num(4, 6))
         self.assertEqual(False, control.RegDst)
         self.assertEqual(False, control.ALUSrc)
         self.assertEqual(False, control.MemtoReg)
@@ -69,7 +70,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_control_bne(self):
         control = Control()
-        control.update(5)
+        control.update(create_sized_binary_num(5, 6))
         self.assertEqual(False, control.RegDst)
         self.assertEqual(False, control.ALUSrc)
         self.assertEqual(False, control.MemtoReg)
@@ -82,7 +83,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_control_addi(self):
         control = Control()
-        control.update(8)
+        control.update(create_sized_binary_num(8, 6))
         self.assertEqual(False, control.RegDst)
         self.assertEqual(True, control.ALUSrc)
         self.assertEqual(False, control.MemtoReg)
@@ -95,7 +96,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_control_andi(self):
         control = Control()
-        control.update(12)
+        control.update(create_sized_binary_num(12, 6))
         self.assertEqual(False, control.RegDst)
         self.assertEqual(True, control.ALUSrc)
         self.assertEqual(False, control.MemtoReg)
@@ -108,7 +109,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_control_jump(self):
         control = Control()
-        control.update(2)
+        control.update(create_sized_binary_num(2, 6))
         self.assertEqual(False, control.RegDst)
         self.assertEqual(False, control.ALUSrc)
         self.assertEqual(False, control.MemtoReg)

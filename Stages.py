@@ -63,6 +63,9 @@ class Fetch(object):
         """
         self.update_program_counter(self.program_counter + 4)
 
+    def receive_pc_address(self, new_pc_address):
+        self.update_program_counter(new_pc_address)
+
     def on_rising_clock(self, next_stage):  # TODO: add next_stage as a class attribute
         """
         Method called when the clock is on a rising edge. Sends the next instruction
@@ -71,8 +74,6 @@ class Fetch(object):
         :return: None
         """
         next_stage.receive_instruction(self.fetch_instruction(), self.program_counter + 4)
-        # TODO: this probably needs to update the program counter too, right?
-        # TODO: should there be a method that's called when the outcome of the branch has been determined?
 
 
 class Decode(object):
@@ -525,8 +526,8 @@ class WriteBack:
         """
         Creates the WriteBack stage of the pipeline
         """
-        #self.fetch_stage = fetch_stage
-        #self.decode_stage = decode_stage
+        self.fetch_stage = fetch_stage
+        self.decode_stage = decode_stage
         self.jump = None
         self.MemtoReg = None
         self.jump_address = None
@@ -560,9 +561,12 @@ class WriteBack:
         self.pc_address = pc_address
         self.mem_data = mem_data
         self.alu_data = alu_data
-        #self.process_jump_decision()
-        #self.process_register_data()
-        #self.send_data_to_stages()
+        self.process_jump_decision()
+        self.process_register_data()
+        if self.fetch_stage and self.decode_stage:  # for testing...
+            self.send_data_to_stages()
+        else:
+            raise Exception("(WriteBack): Error! No stages to write data back to.")
 
     def process_jump_decision(self):
         """
@@ -590,9 +594,9 @@ class WriteBack:
         the value of the program_counter to the Fetch stage.
         :return:
         """
-        #if not self.jump:
-            #self.decode_stage.receive_write_data(self.reg_data)
-        #self.fetch_stage.receive_pc_address(self.new_pc_address)
+        if not self.jump:
+            self.decode_stage.receive_write_data(self.reg_data)
+        self.fetch_stage.receive_pc_address(self.new_pc_address)
 
     def on_rising_clock(self):
         pass
