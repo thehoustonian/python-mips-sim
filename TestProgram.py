@@ -8,6 +8,6 @@ Modified: 3/25/17
 Author: Trey Franklin
 """
 
-from Interface import Interface
+from PipelineInterface import PipelineInterface
 
-pipeline_interface = Interface()
+pipeline_interface = PipelineInterface()

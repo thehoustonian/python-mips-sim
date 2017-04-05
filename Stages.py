@@ -64,6 +64,7 @@ class Fetch(object):
         self.update_program_counter(self.program_counter + 4)
 
     def receive_pc_address(self, new_pc_address):
+        # self.update_program_counter(decode_signed_binary_number(new_pc_address, 32))
         self.update_program_counter(new_pc_address)
 
     def on_rising_clock(self, next_stage):  # TODO: add next_stage as a class attribute
@@ -250,10 +251,12 @@ class Execute:
         self._MemtoReg = MemtoReg
         self._MemRead = MemRead
         self._Branch = Branch
+        self._jump = jump
         self.process_alu_control()
         self.set_alu_inputs()
         self.execute_alu_operation()
         self.calculate_branch_address()
+        self.send_data_to_next_stage()
 
     def process_alu_control(self):
         """
@@ -404,7 +407,7 @@ class Execute:
         Sends the relevant data and control information to the next stage (Memory in this case)
         :return: None
         """
-        self.next_stage.receive_control_info(self._Branch, self.alu_branch, self._MemWrite, self._MemRead,
+        self.next_stage.receive_control_information(self._Branch, self.alu_branch, self._MemWrite, self._MemRead,
                                              self._MemtoReg, self._jump)
         self.next_stage.receive_data(self._program_counter_value, self._jump_address, self.alu_output,
                                      self.branch_address, self.read_data2)
@@ -438,7 +441,7 @@ class Memory:
         self.pc_source = None  # for the mux to choose which address for the program counter to use
         self.pc_address = None  # new address of the program counter after choosing between the branch and inc'd version
 
-    def receive_control_info(self, branch, alu_branch, MemWrite, MemRead, MemtoReg, jump):
+    def receive_control_information(self, branch, alu_branch, MemWrite, MemRead, MemtoReg, jump):
         """
         Save all of the control signals into attributes
         :param branch: is this a branch instruction?
@@ -595,7 +598,7 @@ class WriteBack:
         :return:
         """
         if not self.jump:
-            self.decode_stage.receive_write_data(self.reg_data)
+            self.decode_stage.write_to_register(self.reg_data)
         self.fetch_stage.receive_pc_address(self.new_pc_address)
 
     def on_rising_clock(self):
