@@ -51,6 +51,8 @@ class Fetch(object):
         :param new_address: new value of the program counter (STRING)
         :return:
         """
+        if isinstance(new_address, str):
+            new_address = decode_signed_binary_number(new_address, 32)
         if new_address % 4 != 0:  # Have to use whole word addressing. Sorry
             raise Exception("Invalid Program Counter Value!")
         else:
@@ -86,6 +88,7 @@ class Decode(object):
         """
         self._instruction = None
         self.register_file = register_file
+        self.register_file[0] = create_sized_binary_num(0, 32)
         self.read_reg_1 = None
         self.read_reg_2 = None
         self.write_register = None

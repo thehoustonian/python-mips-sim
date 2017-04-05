@@ -31,7 +31,7 @@ def create_sized_binary_num(decimal_num, desired_len):
         return num
 
 
-def decode_signed_binary_number(binary_num, bit_count, force_unsigned=False):  # TODO: Could this just call len() on the binary_num?
+def decode_signed_binary_number(binary_num, bit_count, force_unsigned=False):
     """
     It's nice to be able to decode the signed binary numbers too.
     :param binary_num: the string representation of the binary number
@@ -43,6 +43,36 @@ def decode_signed_binary_number(binary_num, bit_count, force_unsigned=False):  #
         return int(binary_num, 2) - (1 << bit_count)
     else:
         return int(binary_num, 2)
+
+
+def decode_asm_register(register):  # TODO: This isn't best practice, remove the method from the class too.
+    """
+    Takes a MIPS assembly representation of a register and converts it to the corresponding register number
+    :param register:
+    :return:
+    """
+    if register == "zero":
+        return 0
+    elif register in ['v0', 'v1']:
+        return int(register[1]) + 2
+    elif register in ['a0', 'a1', 'a2', 'a3']:
+        return int(register[1]) + 4
+    elif register in ['t0', 't1', 't2', 't3', 't4', 't5', 't6', 't7']:
+        return int(register[1]) + 8
+    elif register in ['s0', 's1', 's2', 's3', 's4', 's5', 's6', 's7']:
+        return int(register[1]) + 16
+    elif register in ['t8', 't9']:
+        return int(register[1]) + 16
+    elif register == 'gp':
+        return 28
+    elif register == 'sp':
+        return 29
+    elif register == 'fp':
+        return 30
+    elif register == 'ra':
+        return 31
+    else:
+        raise Exception("Error processing a register decode")
 
 
 class Instruction:
