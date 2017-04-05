@@ -157,9 +157,8 @@ class Decode(object):
         and then concatenating the top four bits of the program counter to this to create a 32 bit address to go to
         :return: None
         """
-        address = create_sized_binary_num(decode_signed_binary_number(self._instruction.binary_version()[:26], 26) << 2, 28)  # shift bottom 26 bits left by two
-        self.jump_address = create_sized_binary_num(self._program_counter_value, 32)[28:32] + address # May not be right maths
-
+        address = create_sized_binary_num(decode_signed_binary_number((self._instruction.binary_version()[6:]), 26) << 2, 28)  # shift bottom 26 bits left by two
+        self.jump_address = create_sized_binary_num(self._program_counter_value, 32)[0:4] + address # May not be right maths
 
     def write_to_register(self, data):
         """
@@ -178,7 +177,7 @@ class Decode(object):
 
 
 class Execute:
-    def __init__(self):
+    def __init__(self, next_stage):
         """
         Create all of the class attributes and initialize them to None.
         """
@@ -212,6 +211,7 @@ class Execute:
         self.alu_branch = None
 
         self.branch_address = None
+        self.next_stage = next_stage
 
     def receive_data(self, data1, data2, immediate, pc_value, jump_address):
         """
@@ -268,6 +268,9 @@ class Execute:
                 self.branch_equal = True
             elif decode_signed_binary_number(self.opcode, 6) == 5:  # branch if not equal
                 self.branch_not_equal = True
+            elif decode_signed_binary_number(self.opcode, 6) == 2: # jump
+                self.branch_equal = False
+                self.branch_not_equal = False
             else:
                 raise Exception("(Execute): "
                                 "Invalid ALUOp and opcode combination! (branching ALUOp, but opcode != beq or bne")
@@ -395,21 +398,201 @@ class Execute:
         elif self.branch_equal or self.branch_not_equal:
             raise Exception("(Execute): Attempted to branch without a value in the immediate field.")
 
+    def send_data_to_next_stage(self):
+        """
+        Sends the relevant data and control information to the next stage (Memory in this case)
+        :return: None
+        """
+        self.next_stage.receive_control_info(self._Branch, self.alu_branch, self._MemWrite, self._MemRead,
+                                             self._MemtoReg, self._jump)
+        self.next_stage.receive_data(self._program_counter_value, self._jump_address, self.alu_output,
+                                     self.branch_address, self.read_data2)
+
     def on_rising_clock(self):
         pass
 
 
 class Memory:
-    def __init__(self):
-        print("Not Implemented")
+    def __init__(self, memory_file, next_stage):
+        """
+        Creates the Memory stage of the pipeline
+        :param memory_file: dictionary representing data memory
+        """
+        self.Branch = None
+        self.alu_branch = None
+        self.MemWrite = None
+        self.MemRead = None
+        self.MemtoReg = None
+        self.jump = None
+
+        self.program_counter_value = None
+        self.jump_address = None
+        self.alu_result = None
+        self.branch_address = None
+        self.write_data = None
+
+        self.memory = memory_file
+        self.next_stage = next_stage
+        self.read_data = None
+        self.pc_source = None  # for the mux to choose which address for the program counter to use
+        self.pc_address = None  # new address of the program counter after choosing between the branch and inc'd version
+
+    def receive_control_info(self, branch, alu_branch, MemWrite, MemRead, MemtoReg, jump):
+        """
+        Save all of the control signals into attributes
+        :param branch: is this a branch instruction?
+        :param alu_branch: result from the ALU indicating whether or not a branch should take place
+        :param MemWrite: Are we writing to memory?
+        :param MemRead: Are we reading from memory?
+        :param MemtoReg: Should a memory value be recorded in a register?
+        :param jump: are we supposed to jump somewhere?
+        :return: None
+        """
+        self.Branch =  branch
+        self.alu_branch = alu_branch
+        self.MemWrite = MemWrite
+        self.MemRead = MemRead
+        self.MemtoReg = MemtoReg
+        self.jump = jump
+
+    def receive_data(self, program_counter, jump_address, alu_output, branch_address, write_data):
+        """
+        Save the data values into attributes
+        :param program_counter: value of the program counter
+        :param jump_address: address to jump to
+        :param alu_output: output from the ALU, which is used as the memory address in this level
+        :param branch_address: address to branch to, if we are branching.
+        :param write_data: data to write to memory if this is a store word
+        :return: None
+        """
+        self.program_counter_value = program_counter
+        self.jump_address = jump_address
+        self.alu_result = alu_output
+        self.branch_address = branch_address
+        self.write_data = write_data
+        self.process_memory_request()
+        self.process_branch_decision()
+        self.set_pc_address()
+        self.send_data_to_next_stage()
+
+    def process_memory_request(self):
+        if self.MemRead:
+            if decode_signed_binary_number(self.alu_result, 32) > 511:
+                raise Exception("(Memory): Error! Trying to read data from memory with an invalid address! (%s)",
+                                self.alu_result)
+            else:
+                self.read_data = self.memory[self.alu_result]
+
+        elif self.MemWrite:
+            if decode_signed_binary_number(self.alu_result, 32) > 511:
+                raise Exception("(Memory): Error! Trying to write data from memory with an invalid address! (%s)",
+                                self.alu_result)
+            elif len(self.alu_result) != 32:
+                raise Exception("(Memory): Error! attemping to write non-32 bit value to memory!")
+            else:
+                self.memory[self.alu_result] = self.write_data
+        elif self.MemtoReg:
+            raise Exception("(Memory): Error! MemtoReg is high, but memory isn't being read")
+
+    def process_branch_decision(self):
+        """
+        sets pc_source high if alu_branch and branch are both true.
+        :return: None
+        """
+        self.pc_source = self.alu_branch and self.Branch
+
+    def set_pc_address(self):
+        """
+        Sets the value of the Program counter address after going through the mux that chooses between the branch
+        address and the incremented program counter value.
+        :return:
+        """
+        if self.pc_source:
+            self.pc_address = self.branch_address
+        else:
+            self.pc_address = self.program_counter_value
+
+    def send_data_to_next_stage(self):
+        self.next_stage.receive_control_information(self.jump, self.MemtoReg)
+        self.next_stage.receive_data(self.jump_address, self.pc_address, self.read_data, self.alu_result)
 
     def on_rising_clock(self):
         pass
 
 
 class WriteBack:
-    def __init__(self):
-        print("Not Implemented")
+    def __init__(self, fetch_stage=None, decode_stage=None):
+        """
+        Creates the WriteBack stage of the pipeline
+        """
+        #self.fetch_stage = fetch_stage
+        #self.decode_stage = decode_stage
+        self.jump = None
+        self.MemtoReg = None
+        self.jump_address = None
+        self.pc_address = None
+        self.mem_data = None
+        self.alu_data = None
+
+        self.new_pc_address = None
+        self.reg_data = None
+
+    def receive_control_information(self, jump, MemtoReg):
+        """
+        Receives relevant control information from the previous stage
+        :param jump: control input to the mux that decides which address to use for the program counter
+        :param MemtoReg: control input that decides what value to write back to the register file.
+        :return: None
+        """
+        self.jump = jump
+        self.MemtoReg = MemtoReg
+
+    def receive_data(self, jump_address, pc_address, mem_data, alu_data):
+        """
+        Receives the data from the previous stage.
+        :param jump_address: Address to set the program counter to if we are jumping
+        :param pc_address: Address to place in the program counter if we are not jumping.
+        :param mem_data: data from the memory file to write to a register
+        :param alu_data: data from the ALU to write to a register
+        :return: None
+        """
+        self.jump_address = jump_address
+        self.pc_address = pc_address
+        self.mem_data = mem_data
+        self.alu_data = alu_data
+        #self.process_jump_decision()
+        #self.process_register_data()
+        #self.send_data_to_stages()
+
+    def process_jump_decision(self):
+        """
+        Makes a decision on whether to jump based on the value of the jump control line
+        :return:
+        """
+        if self.jump:
+            self.new_pc_address = self.jump_address
+        else:
+            self.new_pc_address = self.pc_address
+
+    def process_register_data(self):
+        """
+        Makes the decision on what to write to registers based on the value of the MemtoReg control line
+        :return:
+        """
+        if self.MemtoReg:
+            self.reg_data = self.mem_data
+        else:
+            self.reg_data = self.alu_data
+
+    def send_data_to_stages(self):
+        """
+        Send the data to be written to a register to the decode stage if we aren't jumping. Unconditionally send
+        the value of the program_counter to the Fetch stage.
+        :return:
+        """
+        #if not self.jump:
+            #self.decode_stage.receive_write_data(self.reg_data)
+        #self.fetch_stage.receive_pc_address(self.new_pc_address)
 
     def on_rising_clock(self):
         pass

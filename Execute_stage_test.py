@@ -1,5 +1,5 @@
 import unittest
-from Stages import Execute
+from Stages import Execute, WriteBack
 from Instruction import create_sized_binary_num, decode_signed_binary_number
 
 
@@ -11,7 +11,7 @@ class MyTestCase(unittest.TestCase):
     pc_value = 8
 
     def test_create_execute_object_default_values(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         self.assertEqual(None, execute.ALUOp)
         self.assertEqual(None, execute.ALUSrc)
         self.assertEqual(None, execute.function_code)
@@ -28,7 +28,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(None, execute.alu_branch)
 
     def test_receive_values_and_update_lw(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
 
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) +
                                                   decode_signed_binary_number(MyTestCase.immediate, 32), 32)[:32]
@@ -50,7 +50,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_receive_values_and_update_add(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) +
                                                   decode_signed_binary_number(MyTestCase.data2, 32), 32)[:32]
 
@@ -71,7 +71,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_receive_values_and_update_addi(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) +
                                                   decode_signed_binary_number(MyTestCase.immediate, 32), 32)[:32]
 
@@ -92,7 +92,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_receive_values_and_update_addi_neg(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) +
                                                   decode_signed_binary_number(MyTestCase.neg_immediate, 32), 32)[:32]
 
@@ -113,7 +113,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_receive_values_and_update_andi(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) &
                                                   decode_signed_binary_number(MyTestCase.immediate, 32), 32)[:32]
 
@@ -134,7 +134,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_receive_values_and_update_sw(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
 
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) +
                                                   decode_signed_binary_number(MyTestCase.immediate, 32), 32)[:32]
@@ -156,7 +156,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_receive_values_and_update_and(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) &
                                                   decode_signed_binary_number(MyTestCase.data2, 32), 32)[:32]
 
@@ -177,7 +177,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_receive_values_and_update_div(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) /
                                                   decode_signed_binary_number(MyTestCase.data2, 32), 32)[:32]
 
@@ -198,7 +198,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_receive_values_and_update_or(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) |
                                                   decode_signed_binary_number(MyTestCase.data2, 32), 32)[:32]
 
@@ -219,7 +219,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_mul(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) *
                                                   decode_signed_binary_number(MyTestCase.data2, 32), 32)[:32]
 
@@ -240,7 +240,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_slt(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(0, 32)[:32]
 
         ALUOp = 0b10
@@ -260,7 +260,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_slt_set(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(1, 32)[:32]
 
         ALUOp = 0b10
@@ -280,7 +280,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_sub(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) -
                                                   decode_signed_binary_number(MyTestCase.data2, 32), 32)[:32]
 
@@ -301,7 +301,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_xor(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         expected_result = create_sized_binary_num(decode_signed_binary_number(MyTestCase.data1, 32) ^
                                                   decode_signed_binary_number(MyTestCase.data2, 32), 32)[:32]
 
@@ -322,7 +322,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(expected_result, execute.alu_output)
 
     def test_branch_if_equal_true(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         alu_branch_output = True
         alu_output = create_sized_binary_num(0, 32)
         branch_address = create_sized_binary_num(MyTestCase.pc_value +
@@ -347,7 +347,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(branch_address, execute.branch_address)
 
     def test_branch_if_equal_false(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         alu_branch_output = False
         branch_address = create_sized_binary_num(MyTestCase.pc_value +
                                                  (decode_signed_binary_number(MyTestCase.immediate, 32) << 2), 32)[:32]
@@ -370,7 +370,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(branch_address, execute.branch_address)
 
     def test_branch_if_not_equal_false(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         alu_branch_output = False
         alu_output = create_sized_binary_num(0, 32)
         branch_address = create_sized_binary_num(MyTestCase.pc_value +
@@ -395,7 +395,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(branch_address, execute.branch_address)
 
     def test_branch_if_not_equal_true(self):
-        execute = Execute()
+        execute = Execute(WriteBack)
         alu_branch_output = True
         branch_address = create_sized_binary_num(MyTestCase.pc_value +
                                                  (decode_signed_binary_number(MyTestCase.immediate, 32) << 2), 32)[:32]

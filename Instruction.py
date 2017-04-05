@@ -63,14 +63,14 @@ class Instruction:
         self.branching = False
         self.memory_op = False
         self.binary_name = None
-        self.opcode = None
-        self.rs = None
-        self.rt = None
-        self.rd = None
+        self.opcode = '000000'
+        self.rs = '00000'
+        self.rt = '00000'
+        self.rd = '00000'
         self.shift_amount = create_sized_binary_num(0, 5)
-        self.function_field = None
-        self.immediate = None
-        self.address = None
+        self.function_field = '000000'
+        self.immediate = '0000000000000000'
+        self.address = '00000000000000000000000000'
         self.full_binary_rep = None
 
         self.determine_format()
