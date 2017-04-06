@@ -4,7 +4,6 @@ Instruction.py
 The Instruction class == an abstract representation of a 32-bit MIPS assembly instruction
 
 Created: 3/25/17
-Modified: 3/27/17
 Author: Trey Franklin
 """
 
@@ -73,6 +72,16 @@ def decode_asm_register(register):  # TODO: This isn't best practice, remove the
         return 31
     else:
         raise Exception("Error processing a register decode")
+
+
+def decode_int_reg_val(reg_num):
+     return ['$zero', '$at',
+            '$v0', '$v1',
+            '$a0', '$a1', '$a2', '$a3',
+            '$t0', '$t1', '$t2', '$t3', '$t4', '$t5', '$t6', '$t7',
+            '$s0', '$s1','$s2', '$s3', '$s4', '$s5', '$s6', '$s7',
+            '$t8', '$t9', '$k0', '$k1',
+            '$gp', '$sp', '$fp', '$ra'][reg_num]
 
 
 class Instruction:
@@ -264,3 +273,7 @@ class Instruction:
 
     def binary_version(self):
         return self.full_binary_rep
+
+    def asm_version(self):
+
+        return self.name + " " + str(self._arg1) + " "+ str(self._arg2) + " " + str(self._arg3)

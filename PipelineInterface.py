@@ -1,7 +1,6 @@
 """
 Interface.py
 Created: March 25, 2017
-Modified: March 25, 2017
 Author: Trey Franklin
 
 Creates a datapath from the pipeline components and interfaces with it.
@@ -65,3 +64,6 @@ class PipelineInterface(object):
         :return: int (probably)
         """
         return self.fetch.program_counter
+
+    def retrive_instruction_name(self):
+        return self.decode.instruction.asm_version()

@@ -89,7 +89,7 @@ class PipelineInterfaceTest(unittest.TestCase):
         interface.trigger_clock_cycle()
 
         expected_address = int(
-            PipelineInterfaceTest.starting_address)+ 4  # branch addresses are multiplied by 4 and relative to pc + 4
+            PipelineInterfaceTest.starting_address) + 4  # branch addresses are multiplied by 4 and relative to pc + 4
 
         self.assertEqual(expected_address, interface.retrieve_current_pc_address())
 

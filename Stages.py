@@ -2,7 +2,6 @@
 Stages.py
 Author: Trey Franklin
 Created: March 25, 2017
-Modified: March 25, 2017
 
 Home to all the stages of the pipeline.. maybe
 """
@@ -86,7 +85,7 @@ class Decode(object):
         Fetch stage had fetched an instruction and sent it to the decode stage
         :param register_file: list representing the values in all of the registers. SHOULD BE 32 BIT VALUES
         """
-        self._instruction = None
+        self.instruction = None
         self.register_file = register_file
         self.register_file[0] = create_sized_binary_num(0, 32)
         self.read_reg_1 = None
@@ -105,7 +104,7 @@ class Decode(object):
         :param program_counter_value: Value of the program counter to pass to the execute stage
         :return:
         """
-        self._instruction = instruction
+        self.instruction = instruction
         self._program_counter_value = program_counter_value
         self.update_control()
         self.read_reg_1 = instruction.rs
@@ -125,8 +124,8 @@ class Decode(object):
                                      self.register_file[int(self.read_reg_2, 2)], self.sign_extended_immediate,
                                      self._program_counter_value, self.jump_address)  # because this line passes through the decode stage
 
-        self.next_stage.receive_control_information(self._control.ALUOp, self._instruction.function_field,
-                                                    self._instruction.opcode, self._control.ALUSrc,
+        self.next_stage.receive_control_information(self._control.ALUOp, self.instruction.function_field,
+                                                    self.instruction.opcode, self._control.ALUSrc,
                                                     self._control.MemWrite, self._control.MemtoReg,
                                                     self._control.MemRead, self._control.Branch, self._control.jump)
 
@@ -135,7 +134,7 @@ class Decode(object):
         Populate all the values of the control class
         :return:
         """
-        self._control.update(self._instruction.opcode)
+        self._control.update(self.instruction.opcode)
 
     def update_write_register(self):
         """
@@ -143,18 +142,18 @@ class Decode(object):
         :return:
         """
         if self._control.RegDst:
-            self.write_register = self._instruction.rd
+            self.write_register = self.instruction.rd
         else:
-            self.write_register = self._instruction.rt
+            self.write_register = self.instruction.rt
 
     def sign_extend_immediate_field(self):
         """
         Sign extend the immediate field from 16 bits to 32 bits
         :return:
         """
-        if self._instruction.immediate:
+        if self.instruction.immediate:
             self.sign_extended_immediate = create_sized_binary_num(
-                decode_signed_binary_number(self._instruction.immediate, 16), 32)
+                decode_signed_binary_number(self.instruction.immediate, 16), 32)
 
     def calculate_jump_address(self):
         """
@@ -162,7 +161,7 @@ class Decode(object):
         and then concatenating the top four bits of the program counter to this to create a 32 bit address to go to
         :return: None
         """
-        address = create_sized_binary_num(decode_signed_binary_number((self._instruction.binary_version()[6:]), 26) << 2, 28)  # shift bottom 26 bits left by two
+        address = create_sized_binary_num(decode_signed_binary_number((self.instruction.binary_version()[6:]), 26) << 2, 28)  # shift bottom 26 bits left by two
         self.jump_address = create_sized_binary_num(self._program_counter_value, 32)[0:4] + address # May not be right maths
 
     def write_to_register(self, data):
@@ -171,9 +170,9 @@ class Decode(object):
         :param data:
         :return:
         """
-        if self.write_register:
+        if self.write_register and self._control.RegWrite:
             self.register_file[int(self.write_register, 2)] = data
-        else:
+        elif not self.write_register:
             raise Exception("Trying to write to a register before the write_register destination has been set!")
 
     # TODO: needed for pipelined version
@@ -520,7 +519,7 @@ class Memory:
             self.pc_address = self.program_counter_value
 
     def send_data_to_next_stage(self):
-        self.next_stage.receive_control_information(self.jump, self.MemtoReg)
+        self.next_stage.receive_control_information(self.jump, self.MemtoReg, self.pc_source)
         self.next_stage.receive_data(self.jump_address, self.pc_address, self.read_data, self.alu_result)
 
     def on_rising_clock(self):
@@ -544,7 +543,7 @@ class WriteBack:
         self.new_pc_address = None
         self.reg_data = None
 
-    def receive_control_information(self, jump, MemtoReg):
+    def receive_control_information(self, jump, MemtoReg, pc_source):
         """
         Receives relevant control information from the previous stage
         :param jump: control input to the mux that decides which address to use for the program counter
@@ -553,6 +552,7 @@ class WriteBack:
         """
         self.jump = jump
         self.MemtoReg = MemtoReg
+        self.are_branching = pc_source
 
     def receive_data(self, jump_address, pc_address, mem_data, alu_data):
         """
@@ -600,8 +600,8 @@ class WriteBack:
         the value of the program_counter to the Fetch stage.
         :return:
         """
-        if not self.jump:
-            self.decode_stage.write_to_register(self.reg_data)
+
+        self.decode_stage.write_to_register(self.reg_data)
         self.fetch_stage.receive_pc_address(self.new_pc_address)
 
     def on_rising_clock(self):
