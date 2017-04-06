@@ -79,7 +79,7 @@ class Fetch(object):
 
 
 class Decode(object):
-    def __init__(self, register_file, next_stage):
+    def __init__(self, register_file, next_stage=None):
         """
         Initialized to none because this wouldn't be populated until the
         Fetch stage had fetched an instruction and sent it to the decode stage
@@ -113,7 +113,8 @@ class Decode(object):
         self.sign_extend_immediate_field()
         self.calculate_jump_address()
 
-        self.send_data_to_next_stage()
+        if self.next_stage:  # for testing...
+            self.send_data_to_next_stage()
 
     def send_data_to_next_stage(self):
         """
@@ -181,7 +182,7 @@ class Decode(object):
 
 
 class Execute:
-    def __init__(self, next_stage):
+    def __init__(self, next_stage=None):
         """
         Create all of the class attributes and initialize them to None.
         """
@@ -258,7 +259,8 @@ class Execute:
         self.set_alu_inputs()
         self.execute_alu_operation()
         self.calculate_branch_address()
-        self.send_data_to_next_stage()
+        if self.next_stage:  # for testing...
+            self.send_data_to_next_stage()
 
     def process_alu_control(self):
         """
@@ -419,7 +421,7 @@ class Execute:
 
 
 class Memory:
-    def __init__(self, memory_file, next_stage):
+    def __init__(self, memory_file, next_stage=None):
         """
         Creates the Memory stage of the pipeline
         :param memory_file: dictionary representing data memory
@@ -479,7 +481,8 @@ class Memory:
         self.process_memory_request()
         self.process_branch_decision()
         self.set_pc_address()
-        self.send_data_to_next_stage()
+        if self.next_stage:  # for testing...
+            self.send_data_to_next_stage()
 
     def process_memory_request(self):
         if self.MemRead:

@@ -33,7 +33,7 @@ class MemoryStageTest(unittest.TestCase):
         branch_addr = create_sized_binary_num(4, 32)
         write_data = None
 
-        mem.receive_control_info(branch, alu_branch, MemWrite, MemRead, MemtoReg, jump)
+        mem.receive_control_information(branch, alu_branch, MemWrite, MemRead, MemtoReg, jump)
         with self.assertRaises(Exception) as cm:
             mem.receive_data(pc, ja, alu_output, branch_addr, write_data)
         self.assertTrue("(WriteBack): Error! No stages to write data back to." in str(cm.exception))
@@ -57,7 +57,7 @@ class MemoryStageTest(unittest.TestCase):
         branch_addr = create_sized_binary_num(4, 32)
         write_data = create_sized_binary_num(31, 32)
 
-        mem.receive_control_info(branch, alu_branch, MemWrite, MemRead, MemtoReg, jump)
+        mem.receive_control_information(branch, alu_branch, MemWrite, MemRead, MemtoReg, jump)
         with self.assertRaises(Exception) as cm:
             mem.receive_data(pc, ja, alu_output, branch_addr, write_data)
         self.assertTrue("(WriteBack): Error! No stages to write data back to." in str(cm.exception))
@@ -81,7 +81,7 @@ class MemoryStageTest(unittest.TestCase):
         branch_addr = create_sized_binary_num(4, 32)
         write_data = None
 
-        mem.receive_control_info(branch, alu_branch, MemWrite, MemRead, MemtoReg, jump)
+        mem.receive_control_information(branch, alu_branch, MemWrite, MemRead, MemtoReg, jump)
         with self.assertRaises(Exception) as cm:
             mem.receive_data(pc, ja, alu_output, branch_addr, write_data)
         self.assertTrue("(WriteBack): Error! No stages to write data back to." in str(cm.exception))
@@ -105,7 +105,7 @@ class MemoryStageTest(unittest.TestCase):
         branch_addr = create_sized_binary_num(4, 32)
         write_data = None
 
-        mem.receive_control_info(branch, alu_branch, MemWrite, MemRead, MemtoReg, jump)
+        mem.receive_control_information(branch, alu_branch, MemWrite, MemRead, MemtoReg, jump)
         with self.assertRaises(Exception) as cm:
             mem.receive_data(pc, ja, alu_output, branch_addr, write_data)
         self.assertTrue("(WriteBack): Error! No stages to write data back to." in str(cm.exception))
@@ -129,7 +129,7 @@ class MemoryStageTest(unittest.TestCase):
         branch_addr = create_sized_binary_num(4, 32)
         write_data = None
 
-        mem.receive_control_info(branch, alu_branch, MemWrite, MemRead, MemtoReg, jump)
+        mem.receive_control_information(branch, alu_branch, MemWrite, MemRead, MemtoReg, jump)
         with self.assertRaises(Exception) as cm:
             mem.receive_data(pc, ja, alu_output, branch_addr, write_data)
         self.assertTrue("(WriteBack): Error! No stages to write data back to." in str(cm.exception))

@@ -14,7 +14,7 @@ class WriteBackStageTest(unittest.TestCase):
         mem_data = create_sized_binary_num(64, 32)
         alu_data = create_sized_binary_num(128, 32)
 
-        wb.receive_control_information(jump, MemtoReg)
+        wb.receive_control_information(jump, MemtoReg, True)
         with self.assertRaises(Exception) as cm:
             wb.receive_data(jump_address, pc_address, mem_data, alu_data)
         self.assertTrue("(WriteBack): Error! No stages to write data back to." in str(cm.exception))
@@ -29,7 +29,7 @@ class WriteBackStageTest(unittest.TestCase):
         mem_data = create_sized_binary_num(64, 32)
         alu_data = create_sized_binary_num(128, 32)
 
-        wb.receive_control_information(jump, MemtoReg)
+        wb.receive_control_information(jump, MemtoReg, False)
         with self.assertRaises(Exception) as cm:
             wb.receive_data(jump_address, pc_address, mem_data, alu_data)
         self.assertTrue("(WriteBack): Error! No stages to write data back to." in str(cm.exception))
@@ -44,7 +44,7 @@ class WriteBackStageTest(unittest.TestCase):
         mem_data = create_sized_binary_num(64, 32)
         alu_data = create_sized_binary_num(128, 32)
 
-        wb.receive_control_information(jump, MemtoReg)
+        wb.receive_control_information(jump, MemtoReg, False)
         with self.assertRaises(Exception) as cm:
             wb.receive_data(jump_address, pc_address, mem_data, alu_data)
         self.assertTrue("(WriteBack): Error! No stages to write data back to." in str(cm.exception))
@@ -60,7 +60,7 @@ class WriteBackStageTest(unittest.TestCase):
         mem_data = create_sized_binary_num(64, 32)
         alu_data = create_sized_binary_num(128, 32)
 
-        wb.receive_control_information(jump, MemtoReg)
+        wb.receive_control_information(jump, MemtoReg, False)
         with self.assertRaises(Exception) as cm:
             wb.receive_data(jump_address, pc_address, mem_data, alu_data)
         self.assertTrue("(WriteBack): Error! No stages to write data back to." in str(cm.exception))
