@@ -75,7 +75,7 @@ def decode_asm_register(register):  # TODO: This isn't best practice, remove the
 
 
 def decode_int_reg_val(reg_num):
-     return ['$zero', '$at',
+    return ['$zero', '$at',
             '$v0', '$v1',
             '$a0', '$a1', '$a2', '$a3',
             '$t0', '$t1', '$t2', '$t3', '$t4', '$t5', '$t6', '$t7',
